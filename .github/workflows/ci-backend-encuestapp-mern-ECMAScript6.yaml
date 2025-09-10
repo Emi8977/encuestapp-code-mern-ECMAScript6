@@ -75,7 +75,7 @@ jobs:
           
       - name: Parchar el deployment con el nuevo tag
         run: |
-          PATCH_FILE="encuestapp-k8s-ECMAScript6/backend-encuestapp-mern-ecmascript6/overlays/${{ steps.overlay.outputs.overlay }}/patch-back-deployment.yaml"
+          PATCH_FILE="encuestapp-k8s-ECMAScript6/overlays/${{ steps.overlay.outputs.overlay }}/patch-back-deployment.yaml"
           echo "Actualizando $PATCH_FILE con tag $IMAGE_TAG"
           sed -i "s|image: .*/backend-encuestapp-mern-ecmascript6:.*|image: $IMAGE_NAME:$IMAGE_TAG|g" "$PATCH_FILE"
 
