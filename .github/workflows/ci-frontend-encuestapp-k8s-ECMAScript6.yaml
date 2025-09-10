@@ -51,7 +51,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # --- CAMBIO: Definir tag completo con ambiente + sha corto ---
       - name: Definir tag completo de la imagen con ambiente + sha corto
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
@@ -62,7 +61,7 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          docker build -t $IMAGE_NAME:$IMAGE_TAG ./backend #<---modificar aca en todos los ci
+          docker build -t $IMAGE_NAME:$IMAGE_TAG ./frontend
           docker push $IMAGE_NAME:$IMAGE_TAG
 
       - name: Clonar repo de manifiestos (infra)
@@ -70,15 +69,14 @@ jobs:
         with:
           repository: ${{ env.MANIFESTS_REPO }}
           token: ${{ secrets.K8S_REPO_PAT }}
-          path: encuestapp-k8s-ECMAScript6    # <- Cambiar este path para que coincida con el nuevo nombre
-          ref: main # <- especificás explícitamente la rama
+          path: encuestapp-k8s-ECMAScript6
+          ref: main
           
       - name: Parchar el deployment con el nuevo tag
         run: |
-          PATCH_FILE="frontend-encuestapp-mern-ecmascript6/overlays/${{ steps.overlay.outputs.overlay }}/patch-front-deployment.yaml"   # <- corregido el path
-
+          PATCH_FILE="encuestapp-k8s-ECMAScript6/overlays/${{ steps.overlay.outputs.overlay }}/patch-front-deployment.yaml"
           echo "Actualizando $PATCH_FILE con tag $IMAGE_TAG"
-          sed -i "s|image: .*/frontend-encuestapp-mern-ecmascript6:.*|image: $IMAGE_NAME:$IMAGE_TAG|g" "$PATCH_FILE"    # <- corregido el nombre de imagen en el sed
+          sed -i "s|image: .*/frontend-encuestapp-mern-ecmascript6:.*|image: $IMAGE_NAME:$IMAGE_TAG|g" "$PATCH_FILE"
 
       - name: Commit & Push de los manifiestos parchados
         run: |
